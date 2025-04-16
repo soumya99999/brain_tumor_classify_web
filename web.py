@@ -27,19 +27,24 @@ st.write("Upload an MRI image to classify as Glioma or No tumor.")
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Open and display the image
-    image = Image.open(uploaded_file).convert('RGB')
-    st.image(image, caption='Uploaded Image', use_container_width=True)  # Updated parameter
+    try:
+        # Open and display the image
+        image = Image.open(uploaded_file).convert('RGB')
+        st.image(image, caption='Uploaded Image', use_container_width=True)  # Updated parameter
 
-    # Preprocess the image to match Colab (299x299, normalized)
-    img = image.resize((299, 299), Image.Resampling.LANCZOS)  # Explicitly use LANCZOS for resizing
-    img_array = np.array(img, dtype=np.float32) / 255.0  # Normalize to [0, 1], ensure float32
-    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        # Preprocess the image to match Colab (299x299, normalized)
+        img = image.resize((299, 299), Image.Resampling.LANCZOS)  # Explicitly use LANCZOS for resizing
+        img_array = np.array(img, dtype=np.float32) / 255.0  # Normalize to [0, 1], ensure float32
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
 
-    # Debugging: Display raw prediction output
-    predictions = model.predict(img_array)
-    st.write(f"Raw prediction probability: {predictions[0][0]:.4f}")
+        # Debugging: Display raw prediction output
+        predictions = model.predict(img_array)
+        st.write(f"Raw prediction probability: {predictions[0][0]:.4f}")
 
-    # Interpret prediction (sigmoid output, threshold at 0.5)
-    predicted_class = class_names[1] if predictions[0][0] > 0.5 else class_names[0]
-    st.write(f"Prediction: *{predicted_class}*")
+        # Interpret prediction (sigmoid output, threshold at 0.5)
+        predicted_class = class_names[1] if predictions[0][0] > 0.5 else class_names[0]
+        st.write(f"Prediction: *{predicted_class}*")
+    except Exception as e:
+        st.error(f"An error occurred during prediction: {e}")
+        import traceback
+        st.text(traceback.format_exc())

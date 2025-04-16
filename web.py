@@ -2,9 +2,20 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import tensorflow as tf
+import gdown
+import os
+
+# Google Drive file ID for the model (replace with your actual file ID)
+MODEL_FILE_ID = '1NUWfYhGall3DnCcemnWLgw0n5GXqGbus'
+MODEL_PATH = '1024_relu_xception_model.keras'
+
+# Download the model from Google Drive if not already present
+if not os.path.exists(MODEL_PATH):
+    url = f'https://drive.google.com/uc?id={MODEL_FILE_ID}'
+    gdown.download(url, MODEL_PATH, quiet=False)
 
 # Load the trained model
-model = tf.keras.models.load_model('1024_relu_xception_model.keras')
+model = tf.keras.models.load_model(MODEL_PATH)
 
 # Define class names
 class_names = ['Glioma', 'No tumor']
@@ -31,4 +42,4 @@ if uploaded_file is not None:
 
     # Interpret prediction (sigmoid output, threshold at 0.5)
     predicted_class = class_names[1] if predictions[0][0] > 0.5 else class_names[0]
-    st.write(f"Prediction: **{predicted_class}**")
+    st.write(f"Prediction: *{predicted_class}*")
